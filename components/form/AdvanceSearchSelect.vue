@@ -63,7 +63,7 @@ const options = ref([])
 const selectedOption = ref('')
 const searchQuery = ref('')
 const lastPage = ref(1);
-const currentPage = ref(1);
+const currentPage = ref(0);
 const preloader = ref('search');
 
 const getDescendantProp = (obj, desc) => {
@@ -74,12 +74,14 @@ const getDescendantProp = (obj, desc) => {
 
 function fetchData() {
   if (currentPage.value > lastPage.value) return;
+  currentPage.value++;
   preloader.value = 'fetch';
   getData('fetch');
 }
 
 const search = _debounce(() => {
   preloader.value = 'search';
+  currentPage.value = 1;
   getData('search')
 }, 500)
 const getData = (getType = 'search') => {
@@ -89,10 +91,8 @@ const getData = (getType = 'search') => {
       lastPage.value = data.last_page
       if (getType == 'fetch') {
         options.value = options.value.concat(data.data)
-        currentPage.value++
       } else {
         options.value = data.data
-        currentPage.value = 1
       }
     }).catch(error => console.log(error)).finally(() => preloader.value = null)
 }
